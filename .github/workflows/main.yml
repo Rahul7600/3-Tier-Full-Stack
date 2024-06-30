@@ -1,3 +1,4 @@
+
 name: CI
 
 on:
@@ -18,7 +19,13 @@ jobs:
           port: ${{ secrets.EC2_SSH_PORT }}
           script: |
             cd /home/ec2-user/3-Tier-Full-Stack
-            
+
+      - name: Set Git Config Locally
+        run: |
+          git config user.name "rahul"
+          git config user.email "rahul@gmail.com"
+        working-directory: /home/ec2-user/3-Tier-Full-Stack  # Ensure Git commands run in the correct directory
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
@@ -47,4 +54,5 @@ jobs:
       - name: Run Docker container
         run: |
           docker run -d --name camp -p 3000:3000 rahul7600/camp:latest
+
 
