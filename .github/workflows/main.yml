@@ -11,13 +11,11 @@ jobs:
     runs-on: ubuntu-latest  # Use GitHub-hosted Ubuntu runner
 
     env:
-      PROJECT_PATH: ${{ secrets.PROJECT_PATH }}  # Set the project path from secrets
+      PROJECT_PATH: '/home/ec2-user/3-Tier-Full-Stack'
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
-        with:
-          path: ${{ env.PROJECT_PATH }}  # Set the checkout path
+        uses: actions/checkout@v2
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
@@ -27,21 +25,23 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.EC2_SSH_PORT }}
           script: |
-            cd ${{ secrets.PROJECT_PATH }}
+            mkdir -p ${{ env.PROJECT_PATH }}
+            rsync -avz --delete --exclude '.git' /home/runner/work/3-Tier-Full-Stack/3-Tier-Full-Stack/ ${{ env.PROJECT_PATH }}
+            cd ${{ env.PROJECT_PATH }}
             # Perform deployment tasks in the correct directory
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '21'  # Adjust Node.js version as needed
+          node-version: '14'  # Adjust Node.js version as needed
 
       - name: Install dependencies
         run: npm install
-        working-directory: ${{ secrets.PROJECT_PATH }}
+        working-directory: ${{ env.PROJECT_PATH }}
 
       - name: Run unit tests
         run: npm test
-        working-directory: ${{ secrets.PROJECT_PATH }}
+        working-directory: ${{ env.PROJECT_PATH }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -56,12 +56,13 @@ jobs:
         run: |
           docker build -t rahul7600/camp:latest .
           docker push rahul7600/camp:latest
-        working-directory: ${{ secrets.PROJECT_PATH }}
+        working-directory: ${{ env.PROJECT_PATH }}
 
       - name: Run Docker container
         run: |
           docker run -d --name camp -p 3000:3000 rahul7600/camp:latest
-        working-directory: ${{ secrets.PROJECT_PATH }}
+        working-directory: ${{ env.PROJECT_PATH }}
+
 
 
 
