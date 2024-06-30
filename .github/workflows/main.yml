@@ -6,62 +6,58 @@ on:
     branches:
       - main  # Trigger workflow on pushes to the main branch
 
-jobs:
-  build_and_deploy:
-    runs-on: ubuntu-latest  # Use GitHub-hosted Ubuntu runner
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v2
+    with:
+      fetch-depth: 0
+      path: /home/ec2-user/3-Tier-Full-Stack
 
-    env:
-      PROJECT_PATH: '/home/ec2-user/3-Tier-Full-Stack'
+  - name: Deploy to EC2
+    uses: appleboy/ssh-action@master
+    with:
+      host: ${{ secrets.EC2_HOST }}
+      username: ${{ secrets.EC2_USERNAME }}
+      key: ${{ secrets.SSH_PRIVATE_KEY }}
+      port: ${{ secrets.EC2_SSH_PORT }}
+      script: |
+        mkdir -p /home/ec2-user/3-Tier-Full-Stack
+        rsync -avz --delete --exclude '.git' /home/runner/work/3-Tier-Full-Stack/3-Tier-Full-Stack/ /home/ec2-user/3-Tier-Full-Stack
+        cd /home/ec2-user/3-Tier-Full-Stack
+        # Perform deployment tasks in the correct directory
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+  - name: Set up Node.js
+    uses: actions/setup-node@v2
+    with:
+      node-version: '21'  # Adjust Node.js version as needed
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.EC2_SSH_PORT }}
-          script: |
-            mkdir -p ${{ env.PROJECT_PATH }}
-            rsync -avz --delete --exclude '.git' /home/runner/work/3-Tier-Full-Stack/3-Tier-Full-Stack/ ${{ env.PROJECT_PATH }}
-            cd ${{ env.PROJECT_PATH }}
-            # Perform deployment tasks in the correct directory
+  - name: Install dependencies
+    run: npm install
+    working-directory: /home/ec2-user/3-Tier-Full-Stack
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'  # Adjust Node.js version as needed
+  - name: Run unit tests
+    run: npm test
+    working-directory: /home/ec2-user/3-Tier-Full-Stack
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ${{ env.PROJECT_PATH }}
+  - name: Set up Docker Buildx
+    uses: docker/setup-buildx-action@v1
 
-      - name: Run unit tests
-        run: npm test
-        working-directory: ${{ env.PROJECT_PATH }}
+  - name: Log in to Docker Hub
+    uses: docker/login-action@v2
+    with:
+      username: ${{ secrets.DOCKER_USERNAME }}
+      password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+  - name: Docker build & tag
+    run: |
+      docker build -t rahul7600/camp:latest .
+      docker push rahul7600/camp:latest
+    working-directory: /home/ec2-user/3-Tier-Full-Stack
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Docker build & tag
-        run: |
-          docker build -t rahul7600/camp:latest .
-          docker push rahul7600/camp:latest
-        working-directory: ${{ env.PROJECT_PATH }}
-
-      - name: Run Docker container
-        run: |
-          docker run -d --name camp -p 3000:3000 rahul7600/camp:latest
-        working-directory: ${{ env.PROJECT_PATH }}
+  - name: Run Docker container
+    run: |
+      docker run -d --name camp -p 3000:3000 rahul7600/camp:latest
+    working-directory: /home/ec2-user/3-Tier-Full-Stack
 
 
 
