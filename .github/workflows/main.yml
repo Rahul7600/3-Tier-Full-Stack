@@ -16,7 +16,7 @@ jobs:
         with:
           repository: Rahul7600/3-Tier-Full-Stack
           token: ${{ secrets.YOUR_GITHUB_TOKEN }}
-          path: /home/ec2-user/3-Tier-Full-Stack  # Set the desired checkout path on the runner
+          path: /home/ec2-user/3-Tier-Full-Stack  # Set the checkout path
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
@@ -35,9 +35,11 @@ jobs:
           node-version: '21'  # Adjust Node.js version as needed
 
       - name: Install dependencies
+        working-directory: /home/ec2-user/3-Tier-Full-Stack
         run: npm install
 
       - name: Run unit tests
+        working-directory: /home/ec2-user/3-Tier-Full-Stack
         run: npm test
 
       - name: Set up Docker Buildx
@@ -50,13 +52,20 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Docker build & tag
+        working-directory: /home/ec2-user/3-Tier-Full-Stack
         run: |
           docker build -t rahul7600/camp:latest .
           docker push rahul7600/camp:latest
 
       - name: Run Docker container
+        working-directory: /home/ec2-user/3-Tier-Full-Stack
         run: |
           docker run -d --name camp -p 3000:3000 rahul7600/camp:latest
+
+      - name: Open Web Client Directory
+        working-directory: /home/ec2-user/3-Tier-Full-Stack/src/webclient
+        run: ls -la
+
 
 
 
