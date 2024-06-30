@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest  # Use GitHub-hosted Ubuntu runner
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
@@ -21,16 +24,10 @@ jobs:
           script: |
             cd /home/ec2-user/3-Tier-Full-Stack
 
-      - name: Set Git Config Locally
-        run: |
-          git config user.name "rahul"
-          git config user.email "rahul@gmail.com"
-        working-directory: /home/ec2-user/3-Tier-Full-Stack  # Ensure Git commands run in the correct directory
-
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'  # Adjust Node.js version as needed
+          node-version: '21'  # Adjust Node.js version as needed
 
       - name: Install dependencies
         run: npm install
@@ -55,6 +52,7 @@ jobs:
       - name: Run Docker container
         run: |
           docker run -d --name camp -p 3000:3000 rahul7600/camp:latest
+
 
 
 
