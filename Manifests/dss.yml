@@ -8,7 +8,7 @@ data:
   CLOUDINARY_CLOUD_NAME: ZHdrcDM2c2d3  # Updated value (base64 encoded)
   CLOUDINARY_KEY: NDUzNzYzOTY4NzY3OTU5NTk2  # Updated value (base64 encoded)
   CLOUDINARY_SECRET: NXhxTExaZ1B0S3dRaGVaUEdzb3pR  # Updated value (base64 encoded)
-  MAPBOX_TOKEN: c2sueS5yYXRobG9tYXR0byBvdXQ=  # Updated value (base64 encoded)
+  MAPBOX_TOKEN: c2suZXlKMUlja2Z3YldWNklpd2liVlJqWlhabGFXNXBkR0Y1WkM1b2IyNWpaRzlyYVc0bWNteHhlcmh0dzBxcGQyanNmb2YyYXo1b24ifQ==  # Updated value (base64 encoded)
   DB_URL: bW9uZ29kYjptb25nb2RiLm5ldDovL2RhdGFiYXNl  # Updated value (base64 encoded)
   SECRET: cmFodWw=  # Updated value (base64 encoded)
 
