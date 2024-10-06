@@ -5,12 +5,12 @@ metadata:
   name: yelp-camp-secrets
 type: Opaque
 data:
-  CLOUDINARY_CLOUD_NAME: ZGlpMnJvenRw
-  CLOUDINARY_KEY: NzU3NjQzMjU3ODkxMzY0
-  CLOUDINARY_SECRET: SHpBeTdPU3VCZjJhSUFSUm5Fd0tIcEVtc01N
-  MAPBOX_TOKEN: cGsuZXlKMUlqb2lZV1JwYW1GcGMzZGhiQ0lzSW1FaU9pSmpiSFl3TnpKemVHNHhaRzR5TW1wd1ltWm1OSFZ3YlhObUluMC5SVlFZc3UwUnZKZ0NGNTRrMjJkWDBB
-  DB_URL: bW9uZ29kYitzcnY6Ly9qYWlzd2FsYWRpMjQ2OnNjN1ZHU3lkN2RRQ2NMeTFAY2x1c3RlcjAuaXE2bXV0aC5tb25nb2RiLm5ldC8/cmV0cnlXcml0ZXM9dHJ1ZSZ3PW1ham9yaXR5JmFwcE5hbWU9Q2x1c3RlcjA=
-  SECRET: ZGV2b3Bzc2hhY2s=
+  CLOUDINARY_CLOUD_NAME: ZHdrcDM2c2d3  # Updated value (base64 encoded)
+  CLOUDINARY_KEY: NDUzNzYzOTY4NzY3OTU5NTk2  # Updated value (base64 encoded)
+  CLOUDINARY_SECRET: NXhxTExaZ1B0S3dRaGVaUEdzb3pR  # Updated value (base64 encoded)
+  MAPBOX_TOKEN: c2sueS5yYXRobG9tYXR0byBvdXQ=  # Updated value (base64 encoded)
+  DB_URL: bW9uZ29kYjptb25nb2RiLm5ldDovL2RhdGFiYXNl  # Updated value (base64 encoded)
+  SECRET: cmFodWw=  # Updated value (base64 encoded)
 
 ---
 apiVersion: apps/v1
@@ -63,16 +63,6 @@ spec:
                 secretKeyRef:
                   name: yelp-camp-secrets
                   key: SECRET
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 3000
-            initialDelaySeconds: 30   # Adjust the initial delay here
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 3000
-            initialDelaySeconds: 30   # Adjust the initial delay here
 
 ---
 apiVersion: v1
@@ -84,6 +74,7 @@ spec:
     app: yelp-camp
   ports:
     - protocol: TCP
-      port: 3000
-      targetPort: 3000
+      port: 3000   # External port exposed as 3000
+      targetPort: 3000  # Internal port of the container
   type: LoadBalancer
+
